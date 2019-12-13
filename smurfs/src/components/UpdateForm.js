@@ -1,106 +1,147 @@
-import React from "react";
-import { Form, withFormik } from "formik";
-import * as Yup from "yup";
-import { FormikTextField } from "formik-material-fields"
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'
+
+// MaterialUI
+import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import { connect} from "react-redux"
-import { lightBlue } from '@material-ui/core/colors';
-import {updateSmurf} from '../actions/index'
-const PostItem = () => {
 
-    const useStyles = makeStyles(theme => ({
-        '@global': {
-            body: {
-                backgroundColor: theme.palette.common.white,
-            },
-        },
-        paper: {
-            marginTop: theme.spacing(8),
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-        },
-        avatar: {
-            margin: theme.spacing(1),
-            backgroundColor: theme.palette.secondary.main,
-        },
-        form: {
-            width: '100%', // Fix IE 11 issue.
-            marginTop: theme.spacing(1),
-        },
-        submit: {
-            margin: theme.spacing(3, 0, 2),
-            backgroundColor: lightBlue[200],
-            '&:hover': {
-                backgroundColor: lightBlue[300],
-            }
-        },
-    }));
-    const classes = useStyles();
+import TextField from '@material-ui/core/TextField';
+
+import Button from '@material-ui/core/Button';
 
 
 
-    return (
-        <Container componenet="main" maxWidth="xs">
-            <CssBaseline />
-            <div className={classes.paper}>
-                <Typography component="h1" variant="h5">
-                    Create Your Own Smurf
-                </Typography>
-                <Form className={classes.form} noValidate>
-                    <FormikTextField variant="outlined" margin="normal" fullWidth type="text" name="name" autoComplete="smurf" placeholder="Smurf Name *" />
-                    <FormikTextField variant="outlined" margin="normal" fullWidth type="text" name="height" autoComplete="height" placeholder="Smurf Height *" />
-                    <FormikTextField variant="outlined" margin="normal" fullWidth type="text" name="age" autoComplete="age" placeholder="Smurf Age" />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                    >
-                        Create Your Smurf
-                    </Button>
-
-
-                </Form>
-            </div>  
-        </Container>
-    );
-};
-
-
-
-
-
-const FormikPostItem = withFormik({
-    mapPropsToValues({ name, height, age}) {
-        return {
-         
-            name: name || "",
-            height: height || "",
-            age: age || "",
-        };
+const useStyles = makeStyles(theme => ({
+    container: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      flexDirection: 'column',
+      alignItems: 'center'
     },
-
-    validationSchema: Yup.object().shape({
-        name: Yup.string().min(2, 'Too short!').max(32, 'Too Long!').required("Please enter the name of your item"),
-        height: Yup.string().min(2, 'Too short!').max(144, 'Too Long!').required("Please enter a description"),
-        age: Yup.string().min(2, 'Too short!').max(32, 'Too Long!').required("Please specify a category")
-    }),
-
-    handleSubmit(values, {resetForm, props }) {
-        //values is our object with all our data on it
-        // console.log("props in post request", values)
-    props.updateSmurf(values);
-    console.log(values);
-    resetForm();
+    textField: {
+      marginLeft: theme.spacing(1),
+      marginRight: theme.spacing(1),
+      width: '35%'
+    },
+    dense: {
+      marginTop: theme.spacing(2),
+    },
+   
+    button: {
+        margin: theme.spacing(1),
+        marginTop: '2%',
+        marginBottom: '4.3%',
+        width: '15%'
+    },
+    input: {
+    display: 'none',
+    },
+    DropdownBoxContainer: {
+        marginTop: '1%',
+        display: 'flex',
+        flexDirection: 'row',
+        width: '35%',
+        justifyContent: "space-around"
+    },
+    DropdownBox: {
+     width: '200px',
+        
     }
-})(PostItem);
+  }));
 
 
 
-export default connect(null, { updateSmurf })(FormikPostItem); 
+const UpdateForm = props => {
+    console.log(props.smurf, "edit")
+    const classes = useStyles();
+    const [ready, setReady] = useState("")
+    const [item, setItem] = useState({
+        name: "",
+        age: "",
+        height: "",     
+    });
+    useEffect(() => {
+        setItem(props.smurf)
+    }, [props.smurf]);
+
+const submitHandler = event => {
+    event.preventDefault();
+    
+    axios
+        .put(`http://localhost:3333/smurfs/${props.smurf.id}`, item)  
+        .then(res => {console.log(res); setReady("ready")})
+        .catch(err => console.log(err.response))
+        props.handleClose()
+    
+    console.log(item, "Edit Form submit handler")
+}
+
+
+
+const changeHandler = event => {
+    setItem({ ...item, [event.target.name]: event.target.value })
+}
+
+
+return (
+       
+    <div>
+        
+        <h1>Edit your Smurf</h1>
+        <form className ={classes.container} onSubmit ={submitHandler}>
+            
+        <TextField
+                
+                label = "New Name"
+                variant ="outlined"
+                margin="normal"
+                className={classes.textField}
+                type = "text"
+                name="name"
+                value={item.item_name}
+                onChange={changeHandler}
+                
+                />
+          
+            <TextField
+                
+                label = "New Age"
+                variant ="outlined"
+                margin="normal"
+                className={classes.textField}
+                type = "text"
+                name="age"
+                value={item.item_description}
+                onChange={changeHandler}
+                />
+           
+           <TextField
+                
+                label = "New Height"
+                variant ="outlined"
+                margin="normal"
+                className={classes.textField}
+                type = "text"
+                name="height"
+                value={item.category}
+                onChange={changeHandler}
+                />
+           
+         
+            
+         
+            
+            <Button className={classes.button} variant="outlined"type ="submit">Edit Your Smurf</Button>
+        </form>
+    </div>
+
+)
+
+}
+  
+
+
+
+
+
+export default UpdateForm;

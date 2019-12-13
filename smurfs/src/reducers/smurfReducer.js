@@ -1,4 +1,4 @@
-import { FETCH_SMURF_START, FETCH_SMURF_SUCC, FETCH_SMURF_FAIL, POST_SMURF_SUCC, POST_SMURF_FAIL, UPDATING_SMURF_PROFILE } from '../actions'
+import { FETCH_SMURF_START, FETCH_SMURF_SUCC, FETCH_SMURF_FAIL, POST_SMURF_SUCC, POST_SMURF_FAIL } from '../actions'
 
 const initialState = {
     smurf: null,
@@ -31,11 +31,6 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 smurf: [...state.smurfs, { ...action.payload }]
             }
-        case UPDATING_SMURF_PROFILE:
-            return {
-                ...state,
-                smurf: action.payload
-            };
         default:
             return state;
     }

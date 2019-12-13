@@ -6,10 +6,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import {deleteSmurf, updateSmurf} from '../actions/'
-import {connect} from 'react-redux'
+import { deleteSmurf } from '../actions/'
+import { connect } from 'react-redux'
 import Button from '@material-ui/core/Button'
 import UpdateForm from './UpdateForm'
+import Modal from '@material-ui/core/Modal'
 
 
 
@@ -24,36 +25,58 @@ const useStyles = makeStyles(theme => ({
         height: 0,
         paddingTop: '56.25%', // 16:9
     },
+    modalBox: {
+        height: "25",
+        width: 600,
+        backgroundColor: theme.palette.background.paper,
+        border: '2px solid #000',
+        boxShadow: theme.shadows[5],
+        padding: theme.spacing(2, 4, 3),
+        textAlign: "center",
+        margin: '0 Auto'
+      },
 }))
+
+let showForm = false
 const SmurfCreator = props => {
+    const [open, setOpen] = React.useState(false);
+    // const [openAccount, setOpenAccount] = React.useState(false);
+    // const [postTool, setPostTool] = React.useState(false);
+  
+    const handleOpen = () => {
+      setOpen(true);
+    };
+    const handleClose = () => {
+      setOpen(false);
+    };
     const classes = useStyles();
     console.log(props.smurf)
     return (
-        // <Card className={classes.card}>
-        //     <h1>{props.person.name.title} {props.person.name.first} {props.person.name.last}</h1>
-        //     <CardMedia
-        //         className={classes.media}
-        //         image={props.person.picture.large}
-        //         title="Paella dish"
-        //     />
-        //     <CardContent>
-        //         <Typography variant="body2" color="textSecondary" component="p">
-        //             This impressive paella is a perfect party dish and a fun meal to cook together with your
-        //             guests. Add 1 cup of frozen peas along with the mussels, if you like.
-        // </Typography>
-        //     </CardContent>
-        // </Card>
         <div>
             <h1>Name: {props.smurf.name}</h1>
             <h2>Age: {props.smurf.age}</h2>
             <h2>Height: {props.smurf.height}</h2>
             <h4>Order Created: {props.smurf.id}</h4>
-            <Button onClick={() => {props.deleteSmurf(props.smurf.id)}}>Remove this Smurf</Button>
-            <UpdateForm id={props.smurf.id}/>
-            
+            <Button onClick={() => { props.deleteSmurf(props.smurf.id) }}>Remove this Smurf</Button>
+            <Button onClick = {handleOpen}>Edit Your Smurf</Button>
+
+            <Modal
+                aria-labelledby="simple-modal-title"
+                aria-describedby="simple-modal-description"
+                open={open}
+                onClose={handleClose}
+                className={classes.flex}
+            >
+                <div className={classes.modalBox}>
+                    <UpdateForm handleClose={handleClose} {...props} smurf={props.smurf} />
+                </div>
+            </Modal>
+
+
         </div>
     )
 
 }
 
-export default connect(null, {deleteSmurf, updateSmurf})(SmurfCreator);
+
+export default connect(null, { deleteSmurf })(SmurfCreator);
